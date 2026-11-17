@@ -14,7 +14,7 @@ npm start
 
 Visita [http://localhost:5173](http://localhost:5173). Si el puerto está ocupado porque ya está abierta, utiliza esa dirección. La aplicación debe permanecer ejecutándose mientras se usa.
 
-En otra computadora con **Node.js 22.13 o posterior**, instala y compila una vez:
+En otra computadora con **Node.js 22.16 o posterior** (recomendado Node.js 24 LTS), instala y compila una vez:
 
 ```powershell
 npm ci

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Demostración académica de historia clínica, lectura óptica de DNI y firma simulada",
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.16.0"
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
