@@ -1,0 +1,21 @@
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Hono } from "hono";
+import { readFileSync } from "node:fs";
+import { SQLiteAdapter } from "./sqlite";
+import { seed } from "./seed";
+import { api } from "./api";
+import type { ContextType } from "./types";
+const db = new SQLiteAdapter(process.env.SIGESHRL_DB ?? "data/sigeshrl.sqlite");
+await seed(db);
+const app = new Hono<ContextType>();
+app.use("*", async (c, next) => {
+  c.env = { DB: db };
+  await next();
+});
+app.route("/api", api);
+app.use("*", serveStatic({ root: "./dist/client" }));
+app.get("*", (c) => c.html(readFileSync("dist/client/index.html", "utf8")));
+const port = Number(process.env.PORT ?? 5173);
+serve({ fetch: app.fetch, port, hostname: "127.0.0.1" });
+console.log(`SIGESHRL disponible en http://localhost:${port}`);

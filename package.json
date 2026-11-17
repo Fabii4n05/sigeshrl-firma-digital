@@ -1,0 +1,37 @@
+{
+  "name": "sigeshrl-aula-digital",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Demostración académica de historia clínica, lectura óptica de DNI y firma simulada",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc --noEmit && node scripts/build.mjs",
+    "start": "node dist/local/server.mjs",
+    "test": "tsx --test tests/*.test.ts",
+    "db:backup": "node scripts/backup.mjs",
+    "db:restore": "node scripts/restore.mjs",
+    "postinstall": "node scripts/prepare-ocr.mjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.9",
+    "@tesseract.js-data/spa": "^1.0.0",
+    "hono": "^4.11.0",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "esbuild": "^0.25.12",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
