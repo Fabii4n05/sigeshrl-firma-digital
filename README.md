@@ -4,6 +4,8 @@ Avance académico basado en `Guia_SIGESHRL_Firma_Digital.docx`: agenda, atenció
 
 ## Abrir en VS Code
 
+Al iniciar por primera vez, el proyecto crea automáticamente la base local y las cuentas de demostración. No necesitas crear usuarios ni configurar una base de datos. Puedes ingresar como `medico` con contraseña `Demo2026!`; los demás perfiles están en la sección Cuentas.
+
 Abre esta carpeta y, en la terminal, ejecuta:
 
 ```powershell
@@ -95,7 +97,7 @@ tests/                           Comprobaciones del recorrido y criptografía
 vite.config.js                   Vite y conexión con API local
 ```
 
-El servidor conserva TypeScript; la interfaz se desarrolla en JSX como AdminLab. SQLite evita instalar MySQL para este avance. La publicación usa la misma API con almacenamiento D1. Las migraciones conservan los registros existentes.
+El servidor conserva TypeScript; la interfaz se desarrolla en JSX como AdminLab. SQLite evita instalar MySQL para este avance. La compilación prepara únicamente la ejecución local y no necesita la carpeta `.openai`. Las migraciones conservan los registros existentes.
 
 ## Cuentas
 
