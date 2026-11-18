@@ -1,142 +1,124 @@
-# SIGESHRL Historia clínica y firma simulada
+# SIGESHRL · React + Vite
 
-Aplicación académica construida a partir de `Guia_SIGESHRL_Firma_Digital.docx`. Conecta la agenda, el registro clínico, la bandeja de firmas, la cobertura y Farmacia. Incorpora lectura óptica del número de DNI mediante cámara o imagen, con revisión humana obligatoria, sin necesitar un lector físico.
+Avance académico basado en `Guia_SIGESHRL_Firma_Digital.docx`: agenda, atención, documentos, firma, cobertura y Farmacia. La interfaz usa **React, Vite, JSX, React Router y CSS separado**, siguiendo la organización de AdminLab. No utiliza su base de datos ni sus claves.
 
-**Todo el contenido clínico y las cuentas son ficticios. La firma y la dispensación son simuladas.** La aplicación no consulta RENIEC, no lee el chip del DNIe y no emite firmas digitales IOFE. Puede reconocer el número impreso de un documento; la búsqueda posterior solo encuentra pacientes de la base de demostración.
+## Abrir en VS Code
 
-## Abrir la aplicación
-
-En esta computadora las dependencias están instaladas. Abre `INICIAR.cmd` o, desde la carpeta del proyecto en VS Code:
+Abre esta carpeta y, en la terminal, ejecuta:
 
 ```powershell
-npm start
+npm install
+npm run dev
 ```
 
-Visita [http://localhost:5173](http://localhost:5173). Si el puerto está ocupado porque ya está abierta, utiliza esa dirección. La aplicación debe permanecer ejecutándose mientras se usa.
+En esta computadora las dependencias ya están instaladas. Visita **http://localhost:5173**. Vite actualiza las pantallas al guardar; el servicio local escucha en el puerto 3001. Deja la terminal abierta. Requiere Node.js **22.16 o posterior**; recomendado 24 LTS.
 
-En otra computadora con **Node.js 22.16 o posterior** (recomendado Node.js 24 LTS), instala y compila una vez:
+Para preparar y abrir la versión compilada:
 
 ```powershell
-npm ci
 npm run build
 npm start
 ```
 
-La instalación inicial requiere Internet. Después, el servidor, las pantallas y el motor OCR funcionan localmente sin servicios de pago. Los archivos de reconocimiento en español se incluyen en `public/ocr` al instalar. No requieren un servicio externo de OCR.
+`INICIAR.cmd` también prepara y abre la versión compilada. Detén la ejecución anterior antes de ocupar de nuevo el puerto 5173. `npm run preview` sirve la interfaz compilada y necesita el servicio iniciado por separado con `npm run dev:api`.
 
-Para editar con reconstrucción de la interfaz y reinicio automático del servidor:
+## Recorrido para mostrar el avance
+
+1. Ingresa como **medico**, contraseña **Demo2026!**.
+2. Abre **Escáner de DNI**. Pulsa **Probar QR ficticio**: se genera y decodifica un QR real de prueba.
+3. Confirma **00000014**, busca su cita y abre la atención del **Paciente 014**, historia **HC-DEMO-014**.
+4. Revisa la nota y la receta. En **Documentos y firma**, prueba primero un rechazo y luego la firma simulada satisfactoria en ambos documentos.
+5. Cambia a **Supervisión**: en el periodo de los casos iniciales, la cobertura pasa de **17/20 = 85 %** a **18/20 = 90 %**.
+6. Cambia a **Farmacia** y registra la entrega de prueba. Un reintento no duplica la entrega.
+
+Si se usa otro día, ajusta la fecha de la agenda y el periodo del reporte para incluir los casos iniciales. Reiniciar no borra los datos.
+
+## Escáner de DNI
+
+- **Cámara en vivo, códigos:** QR, PDF417 y Code 128 que contengan un DNI legible. Los QR oficiales cifrados o con otro formato pueden no revelar el número.
+- **Cámara en vivo, texto / MRZ:** OCR local con dos lecturas coincidentes. Requiere buena luz y mantener inmóvil el documento.
+- **Lector USB de códigos:** modo teclado; enfoca el campo y escanea. No lee el chip inteligente.
+- **Ingreso manual:** permite continuar si el documento no se reconoce.
+- **Última alternativa:** cargar una imagen de hasta 12 MB.
+
+Siempre se revisan los ocho dígitos. La cámara no guarda ni sube imágenes; el motor OCR se ejecuta en el navegador. Cámara disponible en `localhost` o HTTPS. La búsqueda consulta únicamente los registros de prueba de esta aplicación, sin RENIEC. Escanear un documento no autentica a su titular.
+
+## DNIe con el celular Android NFC
+
+Se incluye **public/android/SIGESHRL-Lector-NFC.apk** y su fuente en **android-nfc/**. Es una prueba nativa experimental: la web por sí sola no puede enviar los comandos ISO-DEP que necesita el chip. Web NFC se limita a NDEF ([Chrome](https://developer.chrome.com/docs/capabilities/nfc)).
+
+1. En Android 8 o posterior con NFC, descarga e instala el APK del proyecto. Activa NFC y abre **SIGESHRL Lector NFC**.
+2. Acerca el DNIe a la antena posterior. Se intenta leer el certificado **sin PIN**, reconociendo los perfiles 2.0 y 3.0. Si el chip no expone su aplicación PKI por NFC, se informa el error. No se simula una lectura exitosa.
+3. En la web abre un documento propio y despliega **Probar firma del chip con Android NFC**. Escribe el DNI del titular del certificado y prepara la solicitud.
+4. Copia el código al lector Android o abre su enlace desde el teléfono. Revisa titular, documento y huella. Mantén la tarjeta cerca y escribe **tu PIN personal únicamente en la app Android**; pulsa firmar.
+5. Copia el resultado JSON a la web y pulsa **Comprobar firma del chip**. La solicitud vence en diez minutos y solo se acepta una vez.
+
+La app no tiene permiso de Internet, no guarda el PIN ni la clave privada y no cambia datos del DNI. Envía el PIN al chip únicamente al pulsar firmar. Consulta los intentos disponibles y se detiene si queda uno o el contador no es accesible. **No pruebes PIN supuestos.** Si el DNI no expone PKI mediante NFC o exige un canal seguro adicional, esta prueba no podrá firmar; se necesitará un medio compatible. No se ha probado con un teléfono o DNI físico.
+
+Los comandos se basan en los manuales oficiales de [RENIEC 2.0](https://identidad.reniec.gob.pe/documents/d/guest/manual_comandos_dnie_v2) y [RENIEC 3.0](https://identidad.reniec.gob.pe/documents/d/guest/manual_comandos_dnie_v3). Estos manuales no garantizan que el canal NFC del DNI permita todas esas operaciones.
+
+**El resultado es una prueba criptográfica del desafío que incluye la huella del documento. No es un PDF con firma PAdES ni una firma institucional validada.** Se comprueba la firma RSA/SHA-256, la vigencia y el DNI declarado en el certificado, pero no su cadena de confianza ni revocación. Por eso se guarda como prueba separada y no habilita la receta ni cambia la cobertura. La firma simulada está identificada y permite exponer el recorrido completo.
+
+Para recompilar el APK se necesitan Java 17 y Android SDK con plataforma y Build Tools:
 
 ```powershell
-npm run dev
+powershell -ExecutionPolicy Bypass -File android-nfc/build.ps1
 ```
 
-Actualiza el navegador después de cambiar la interfaz. El desarrollo usa el mismo puerto 5173; detén la ejecución anterior antes de iniciarlo.
+El script acepta `-SdkPath` y `-JavaPath`. Produce un APK con firma de desarrollo; no es una aplicación publicada en Play Store. `android-nfc/build/` se excluye del repositorio y del paquete.
 
-## Cuentas de demostración
+## Organización como AdminLab
 
-Contraseña común: **`Demo2026!`**. El selector del acceso completa la cuenta elegida. El selector superior permite cambiar de cuenta de prueba mediante una nueva autenticación en el servidor.
+```text
+src/
+  main.jsx                       ReactDOM + BrowserRouter + CSS
+  App.jsx                        Rutas y sesión
+  pages/
+    public/                      Acceso y guía
+    clinical/                    Agenda, escáner, atención y firma
+    supervision/                 Cobertura
+    pharmacy/                    Farmacia
+    admin/                       Accesos y bitácora
+  components/
+    layout/                      Menú y cabecera
+    shared/                      Controles y rutas protegidas
+    clinical/                    Documento y prueba NFC
+  css/
+    global/                      Diseño general
+    pages/clinical/              Escáner y prueba NFC
+  lib/                           API, OCR, lector, PDF y utilidades
+server/                          API Hono y SQLite local; TypeScript
+drizzle/                         Migraciones de base de datos
+android-nfc/                     Lector nativo Java sin dependencias externas
+public/                          APK, motor OCR y muestra ficticia
+tests/                           Comprobaciones del recorrido y criptografía
+vite.config.js                   Vite y conexión con API local
+```
 
-| Usuario | Función | Ámbito |
-| --- | --- | --- |
-| medico | Dra. Lucía Mendoza | Sus atenciones de Consulta Externa y sus documentos |
-| enfermeria | Lic. Andrea Torres | Atenciones asignadas al servicio y sus registros de enfermería |
-| admision | Rosa del Carmen Ruiz | Agenda e identificación en Consulta Externa |
-| supervision | Dr. Gabriel Salas | Cobertura de los tres servicios y detalle adicional autorizado |
-| farmacia | Q. F. Elena Ríos | Recetas vigentes y dispensación en Consulta Externa |
-| admin | Carlos Vega | Habilitación de cuentas, permiso de detalle y auditoría |
+El servidor conserva TypeScript; la interfaz se desarrolla en JSX como AdminLab. SQLite evita instalar MySQL para este avance. La publicación usa la misma API con almacenamiento D1. Las migraciones conservan los registros existentes.
 
-Existe una cuenta adicional `medico.otros` para comprobar el aislamiento de Hospitalización. No aparece en el selector habitual. El permiso adicional de Supervisión se puede retirar desde Administración; el resumen continúa disponible y el detalle se bloquea.
+## Cuentas
 
-Estas credenciales son públicas dentro del proyecto y sirven exclusivamente para la exposición. No usar la aplicación con datos reales ni como sistema hospitalario de producción.
+Contraseña común: **Demo2026!**. El selector superior permite cambiar el perfil de demostración.
 
-## Recorrido recomendado
-
-1. Entra como **Médico** y abre **Identificar DNI**.
-2. Pulsa **Probar con una muestra ficticia**. Se ejecuta OCR sobre `public/dni-ejemplo.png`; no se precarga un resultado falso.
-3. Revisa el número **00000014**, marca la confirmación y busca el registro.
-4. Abre la atención del **Paciente 014**, con historia **HC-DEMO-014**.
-5. Revisa la nota y la receta. Ambas comienzan pendientes. No necesitas volver a guardar el registro si no lo has modificado.
-6. En la bandeja elige **Certificado de prueba rechazado** y simula un intento. El documento sigue pendiente.
-7. Elige **Simulación satisfactoria** y firma los dos documentos. La marca puede ubicarse a la izquierda o derecha de la última página.
-8. Comprueba la integridad del original; descarga el JSON y el PDF académico. Una copia cuyo `rawPayload` cambie debe fallar la comparación.
-9. Cambia a **Supervisión** y revisa el periodo que incluya las fechas iniciales. Consulta Externa pasa de **17/20 = 85 %** a **18/20 = 90 %** al completar ambos documentos del caso.
-10. Cambia a **Farmacia**, busca al Paciente 014, revisa la receta y registra una entrega simulada. Un reintento no genera una segunda dispensación.
-11. En **Administración** o **Supervisión**, revisa la bitácora autorizada.
-
-Los pacientes tienen DNI ficticios correlativos: por ejemplo `00000013`, `00000014` y `00000015`. Los casos iniciales se crean la primera vez que inicia el proyecto. Si expones otro día, cambia la fecha de agenda a la fecha inicial o el periodo del reporte para incluirla. El caso 014 tiene cita a las 09:00 en esa fecha.
-
-## Lectura por cámara o imagen
-
-- **Usar cámara** solicita el permiso del navegador y permite capturar una imagen. La cámara requiere `localhost` o HTTPS. La existencia y calidad de la cámara dependen del equipo.
-- **Cargar imagen** acepta JPG, PNG, WebP y BMP de hasta 12 MB.
-- El motor Tesseract.js reconoce el texto en el navegador. La fotografía no se sube al servidor. Se descarta de la interfaz al salir del módulo; no se almacena en la base de datos.
-- Se muestra el texto reconocido y, si hay varios números posibles, las alternativas para revisión. El número confirmado se envía al servidor para buscar una cita autorizada.
-- Hay entrada manual de ocho dígitos cuando la fotografía tiene reflejos, poca resolución o el reconocimiento no funciona.
-- La muestra incluida tiene una advertencia visible y **no reproduce un documento oficial**.
-
-OCR no certifica que el documento sea auténtico ni que pertenezca a quien lo presenta. Escribir o leer un DNI no crea una cuenta ni otorga permisos.
-
-## Qué representa la firma
-
-El servidor conserva una copia JSON inmutable del contenido de cada documento y una huella SHA-256 en la constancia de simulación. Registra el firmante de prueba, fecha, posición de la marca y resultado del intento. Un fallo conserva el pendiente y admite reintento.
-
-La huella comprueba coincidencia de contenido. **No es una firma criptográfica con certificado ni valida identidad, cadena de confianza, vigencia, revocación o sello de tiempo.** El PDF exportado es una representación académica y tampoco está firmado digitalmente. Para corregir un documento ya firmado en la demo se genera una nueva versión, conservando la anterior y su constancia.
-
-El punto de sustitución para un firmador real es la operación `POST /api/documents/:id/sign`, descrita en [el diseño de integración](docs/INTEGRACION.md). La incorporación de Firma Perú u otro componente requiere documentación, permisos y pruebas de la DITI.
-
-## Implementación
-
-| Parte | Tecnología |
+| Usuario | Módulo |
 | --- | --- |
-| Interfaz | React 19, TypeScript y CSS adaptable |
-| Compilación | esbuild; no necesita Laravel, PHP ni MySQL |
-| Servidor | Hono con Node.js en local y entrada compatible con Workers |
-| Datos locales | SQLite del propio Node.js, en `data/sigeshrl.sqlite` |
-| OCR | Tesseract.js y datos de español servidos desde el proyecto |
-| Documentos | Copia JSON, huella SHA-256 y PDF académico |
-| Pruebas | Pruebas de integración de API y lectura de DNI |
+| medico | Agenda, atención y documentos propios |
+| enfermeria | Atención y registro propio de enfermería |
+| admision | Agenda e identificación |
+| supervision | Cobertura y detalle autorizado |
+| farmacia | Recetas y entrega de prueba |
+| admin | Accesos y auditoría |
 
-El servidor comprueba los permisos de rol, servicio y registro, además de autoría para la firma. En esta demostración, Admisión y Enfermería tienen asignado el ámbito de Consulta Externa; la asignación individual de enfermería debe adaptarse al flujo real del hospital. Farmacia no recibe el contenido de la nota clínica. Administración no puede abrir la atención por el solo hecho de ser administrador.
+Todas las cuentas y pacientes son ficticios. Los permisos se comprueban en el servidor por rol, servicio, autor y relación con el registro. No es un sistema para atención hospitalaria real.
 
-Las contraseñas de prueba se guardan con PBKDF2 y sal independiente. Las sesiones usan cookies HttpOnly y SameSite Strict; el atributo Secure se activa en HTTPS. Caducan tras 30 minutos sin actividad del servidor o al cumplir ocho horas. Las mutaciones comprueban el origen y un encabezado de aplicación. Los cambios de permisos revocan las sesiones de la cuenta afectada.
-
-Las operaciones relacionadas se agrupan en transacciones. La firma y la dispensación tienen una restricción única por documento para evitar duplicados concurrentes. La edición utiliza una versión y un identificador de operación para rechazar cambios simultáneos obsoletos.
-
-No se almacena información clínica en `localStorage`. Solo se conserva allí la preferencia visual. El almacenamiento institucional cifrado, las copias externas, el endurecimiento, la supervisión de seguridad y los niveles de servicio quedan fuera de esta demostración.
-
-## Respaldo y recuperación local
-
-Con la aplicación funcionando puedes crear una copia consistente:
-
-```powershell
-npm run db:backup
-```
-
-Se guarda en `backups/`. Para restaurar, detén antes el servidor y ejecuta:
-
-```powershell
-npm run db:restore -- "backups/nombre-del-respaldo.sqlite" --confirm
-```
-
-La restauración comprueba la integridad y el tipo de archivo, conserva una copia previa de la base actual y cierra las sesiones recuperadas. No elimina documentos individualmente. Conserva los respaldos fuera del repositorio; contienen todos los datos y cuentas de esta demostración.
-
-Las bases local y alojada, si se usa la publicación privada, son independientes. Este comando respalda únicamente la base local. Para un despliegue real deben acordarse con DITI la frecuencia, custodia, pérdida tolerable y tiempo de recuperación.
-
-## Revisión del proyecto
+## Comprobaciones y respaldo
 
 ```powershell
 npm test
 npm run build
 npm audit
+npm run db:backup
 ```
 
-Consulta [la matriz de alcance](docs/ALCANCE.md) y [las comprobaciones de entrega](docs/PRUEBAS.md). La guía original proponía Laravel y MySQL; aquí se eligió React y un servidor de JavaScript con SQLite para simplificar la instalación, siguiendo la solicitud del grupo.
-
-## Fuentes para la decisión sobre DNIe
-
-- [Chrome Web NFC](https://developer.chrome.com/docs/capabilities/nfc): su alcance es NDEF y no expone operaciones de bajo nivel como ISO-DEP.
-- [RENIEC DNI electrónico](https://identidad.reniec.gob.pe/es/dni-electronico): información y controladores para el DNIe.
-- [RENIEC Actualizar PIN](https://www.gob.pe/institucion/reniec/pages/99724-actualizar-pin-de-seguridad): requisitos del procedimiento con lector compatible.
-- [Tesseract.js](https://github.com/naptha/tesseract.js): motor OCR utilizado y licencia Apache 2.0.
-
-La guía suministrada se tomó como especificación funcional de referencia. Sus propuestas tecnológicas y futuras integraciones no se presentaron como servicios ya disponibles ni como autorizaciones para acceder a sistemas del hospital.
+La base local está en `data/sigeshrl.sqlite`, excluida del ZIP y del repositorio. `npm run db:restore -- ruta-de-copia.sqlite` permite restaurar con el servidor detenido y crea una copia previa. Consulta **docs/PRUEBAS.md**, **docs/ALCANCE.md** y **docs/INTEGRACION.md** para el detalle y los pendientes institucionales.

@@ -1,5 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync, mkdirSync } from "node:fs";
+import { readFileSync, mkdirSync, readdirSync } from "node:fs";
 import path from "node:path";
 import type { Database, Statement, Result } from "./types";
 export class SQLiteAdapter implements Database {
@@ -13,15 +13,27 @@ export class SQLiteAdapter implements Database {
     this.raw.exec(
       "CREATE TABLE IF NOT EXISTS _local_migrations (name TEXT PRIMARY KEY)",
     );
-    if (
-      !this.raw
-        .prepare("SELECT name FROM _local_migrations WHERE name=?")
-        .get("0000_initial")
-    ) {
-      this.raw.exec(readFileSync("drizzle/0000_initial.sql", "utf8"));
-      this.raw
-        .prepare("INSERT INTO _local_migrations(name) VALUES (?)")
-        .run("0000_initial");
+    for (const file of readdirSync("drizzle")
+      .filter((file) => file.endsWith(".sql"))
+      .sort()) {
+      const name = file.slice(0, -4);
+      if (
+        this.raw
+          .prepare("SELECT name FROM _local_migrations WHERE name=?")
+          .get(name)
+      )
+        continue;
+      this.raw.exec("BEGIN IMMEDIATE");
+      try {
+        this.raw.exec(readFileSync(path.join("drizzle", file), "utf8"));
+        this.raw
+          .prepare("INSERT INTO _local_migrations(name) VALUES (?)")
+          .run(name);
+        this.raw.exec("COMMIT");
+      } catch (e) {
+        this.raw.exec("ROLLBACK");
+        throw e;
+      }
     }
   }
   prepare(sql: string): Statement {

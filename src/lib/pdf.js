@@ -1,5 +1,5 @@
-import { docTitle, formatDate } from "./api";
-export async function exportPDF(data: any) {
+import { docTitle, formatDate } from "./api.js";
+export async function exportPDF(data) {
   const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF();
   const p = data.document,
@@ -32,7 +32,7 @@ export async function exportPDF(data: any) {
       y = 49;
     }
   }
-  function lines(value: string, size = 10, bold = false) {
+  function lines(value, size = 10, bold = false) {
     pdf.setFont("helvetica", bold ? "bold" : "normal");
     pdf.setFontSize(size);
     const list = pdf.splitTextToSize(value, pageWidth - margin * 2);
@@ -43,7 +43,7 @@ export async function exportPDF(data: any) {
     }
     y += 3;
   }
-  function section(label: string, value: string) {
+  function section(label, value) {
     ensure(20);
     lines(label.toUpperCase(), 9, true);
     lines(value || "Sin registro");

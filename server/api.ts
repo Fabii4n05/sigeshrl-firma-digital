@@ -5,6 +5,7 @@ import { bodyLimit } from "hono/body-limit";
 import type { ContextType, Database, User, Row, Role } from "./types";
 import { sha256, passwordHash, equal, uid, today } from "./crypto";
 import { seed, demoProfiles } from "./seed";
+import { nfcApi } from "./nfc-api";
 
 export const api = new Hono<ContextType>();
 const fail = (
@@ -993,6 +994,7 @@ api.patch("/admin/users/:id", async (c) => {
   ]);
   return c.json({ ok: true });
 });
+api.route("/nfc", nfcApi);
 api.all("*", (c) =>
   c.json({ error: "La operación solicitada no existe." }, 404),
 );

@@ -1,30 +1,19 @@
 import { spawn } from "node:child_process";
-import { context } from "esbuild";
-await import("./build.mjs");
-const browser = await context({
-  entryPoints: { app: "src/main.tsx" },
-  outdir: "dist/client/assets",
-  bundle: true,
-  format: "esm",
-  splitting: true,
-  platform: "browser",
-  target: "es2022",
-  jsx: "automatic",
-  define: { "process.env.NODE_ENV": '"development"' },
-});
-await browser.watch();
-const server = spawn(
+const api = spawn(
   process.execPath,
   ["--import", "tsx", "--watch", "server/local.ts"],
-  { stdio: "inherit" },
+  { stdio: "inherit", env: { ...process.env, PORT: "3001" } },
 );
-for (const signal of ["SIGINT", "SIGTERM"])
-  process.on(signal, async () => {
-    server.kill();
-    await browser.dispose();
-    process.exit();
-  });
-server.on("exit", async (code) => {
-  await browser.dispose();
-  process.exit(code ?? 0);
+const web = spawn(process.execPath, ["node_modules/vite/bin/vite.js"], {
+  stdio: "inherit",
 });
+let stopping = false;
+function stop(code = 0) {
+  if (stopping) return;
+  stopping = true;
+  api.kill();
+  web.kill();
+  process.exitCode = code;
+}
+for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => stop());
+for (const child of [api, web]) child.on("exit", (code) => stop(code ?? 0));

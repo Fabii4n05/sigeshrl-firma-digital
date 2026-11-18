@@ -8,7 +8,7 @@ import {
   Loader2,
   ArrowUpRight,
 } from "lucide-react";
-export const statusLabel: Record<string, string> = {
+export const statusLabel = {
   programada: "Programada",
   en_atencion: "En atención",
   atendida: "Atendida",
@@ -18,13 +18,7 @@ export const statusLabel: Record<string, string> = {
   lista: "Lista en demo",
   dispensada: "Dispensada en demo",
 };
-export function Badge({
-  status,
-  children,
-}: {
-  status?: string;
-  children?: React.ReactNode;
-}) {
+export function Badge({ status, children }) {
   return (
     <span className={"badge " + (status ?? "neutral")}>
       {status === "signed" ||
@@ -38,11 +32,7 @@ export function Badge({
     </span>
   );
 }
-export function Spinner({
-  label = "Cargando información…",
-}: {
-  label?: string;
-}) {
+export function Spinner({ label = "Cargando información…" }) {
   return (
     <div className="loading">
       <Loader2 className="spin" size={23} />
@@ -50,15 +40,7 @@ export function Spinner({
     </div>
   );
 }
-export function Empty({
-  title = "Sin registros",
-  message,
-  children,
-}: {
-  title?: string;
-  message?: string;
-  children?: React.ReactNode;
-}) {
+export function Empty({ title = "Sin registros", message, children }) {
   return (
     <div className="empty">
       <span className="empty-icon">
@@ -70,13 +52,7 @@ export function Empty({
     </div>
   );
 }
-export function ErrorBox({
-  message,
-  retry,
-}: {
-  message: string;
-  retry?: () => void;
-}) {
+export function ErrorBox({ message, retry }) {
   return (
     <div className="error-box" role="alert">
       <AlertCircle size={18} />
@@ -89,26 +65,16 @@ export function ErrorBox({
     </div>
   );
 }
-export function Modal({
-  title,
-  children,
-  onClose,
-  wide = false,
-}: {
-  title: string;
-  children: React.ReactNode;
-  onClose: () => void;
-  wide?: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
+export function Modal({ title, children, onClose, wide = false }) {
+  const ref = useRef(null);
   useEffect(() => {
-    const old = document.activeElement as HTMLElement;
+    const old = document.activeElement;
     const root = ref.current;
     root?.focus();
-    const key = (e: KeyboardEvent) => {
+    const key = (e) => {
       if (e.key === "Escape") onClose();
       if (e.key === "Tab") {
-        const items = root?.querySelectorAll<HTMLElement>(
+        const items = root?.querySelectorAll(
           'button:not([disabled]),input,select,a[href],textarea,[tabindex="0"]',
         );
         if (!items?.length) return;
@@ -161,17 +127,7 @@ export function Modal({
     </div>
   );
 }
-export function PageHeading({
-  eyebrow,
-  title,
-  description,
-  action,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-  action?: React.ReactNode;
-}) {
+export function PageHeading({ eyebrow, title, description, action }) {
   return (
     <div className="page-heading">
       <div>
@@ -183,19 +139,7 @@ export function PageHeading({
     </div>
   );
 }
-export function Metric({
-  label,
-  value,
-  detail,
-  icon,
-  color = "mint",
-}: {
-  label: string;
-  value: React.ReactNode;
-  detail: string;
-  icon: React.ReactNode;
-  color?: string;
-}) {
+export function Metric({ label, value, detail, icon, color = "mint" }) {
   return (
     <div className="metric">
       <div className="metric-top">
@@ -207,19 +151,7 @@ export function Metric({
     </div>
   );
 }
-export function Panel({
-  title,
-  subtitle,
-  children,
-  action,
-  className = "",
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-  action?: React.ReactNode;
-  className?: string;
-}) {
+export function Panel({ title, subtitle, children, action, className = "" }) {
   return (
     <section className={"panel " + className}>
       <div className="panel-heading">
@@ -233,13 +165,7 @@ export function Panel({
     </section>
   );
 }
-export function LinkArrow({
-  children,
-  onClick,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
+export function LinkArrow({ children, onClick }) {
   return (
     <button className="text-button" onClick={onClick}>
       {children}

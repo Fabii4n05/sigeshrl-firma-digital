@@ -13,11 +13,17 @@ import {
   CheckCheck,
   RefreshCw,
 } from "lucide-react";
-import type { PageProps } from "../App";
-import { localDate, formatDate, post } from "../api";
-import { useResource } from "../hooks";
-import { Badge, Spinner, ErrorBox, Empty, Metric, Panel } from "../ui";
-export function Agenda({ user, go, notify }: PageProps) {
+import { localDate, formatDate, post } from "../../lib/api.js";
+import { useResource } from "../../lib/hooks.js";
+import {
+  Badge,
+  Spinner,
+  ErrorBox,
+  Empty,
+  Metric,
+  Panel,
+} from "../../components/shared/UI.jsx";
+export function Agenda({ user, go, notify }) {
   const [date, setDate] = useState(localDate()),
     [search, setSearch] = useState(""),
     [status, setStatus] = useState("all"),
@@ -27,16 +33,16 @@ export function Agenda({ user, go, notify }: PageProps) {
   );
   const rows = data?.appointments ?? [];
   const filtered = rows.filter(
-    (a: any) =>
+    (a) =>
       (status === "all" || a.status === status) &&
-      [a.patient_name, a.history, a.dni].some((s: string) =>
+      [a.patient_name, a.history, a.dni].some((s) =>
         s.toLowerCase().includes(search.toLowerCase()),
       ),
   );
   const pending = rows.filter(
-    (a: any) => a.documents.total > a.documents.signed,
+    (a) => a.documents.total > a.documents.signed,
   ).length;
-  async function open(a: any) {
+  async function open(a) {
     setBusy(a.id);
     try {
       if (user.role === "admision") {
@@ -48,12 +54,12 @@ export function Agenda({ user, go, notify }: PageProps) {
         go("atencion/" + result.encounterId);
       }
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
     } finally {
       setBusy("");
     }
   }
-  function shift(n: number) {
+  function shift(n) {
     const d = new Date(date + "T12:00:00-05:00");
     d.setDate(d.getDate() + n);
     setDate(
@@ -127,7 +133,7 @@ export function Agenda({ user, go, notify }: PageProps) {
         <Metric
           label="Por atender"
           value={rows
-            .filter((a: any) => a.status === "programada")
+            .filter((a) => a.status === "programada")
             .length.toString()
             .padStart(2, "0")}
           detail="Pacientes en la agenda"
@@ -137,7 +143,7 @@ export function Agenda({ user, go, notify }: PageProps) {
         <Metric
           label="Atenciones completadas"
           value={rows
-            .filter((a: any) => a.status === "atendida")
+            .filter((a) => a.status === "atendida")
             .length.toString()
             .padStart(2, "0")}
           detail="Estado asistencial"
@@ -248,7 +254,7 @@ export function Agenda({ user, go, notify }: PageProps) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((a: any) => (
+                {filtered.map((a) => (
                   <tr
                     key={a.id}
                     className={

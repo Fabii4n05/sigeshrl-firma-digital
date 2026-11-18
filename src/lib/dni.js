@@ -1,17 +1,10 @@
-export interface DniResult {
-  dni: string;
-  candidates: string[];
-  name: string;
-  raw: string;
-  needsReview: boolean;
-}
-export function parseDni(raw: string): DniResult {
+export function parseDni(raw) {
   const normalized = raw
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase();
-  const candidates: string[] = [];
-  const add = (value: string) => {
+  const candidates = [];
+  const add = (value) => {
     if (/^\d{8}$/.test(value) && !candidates.includes(value))
       candidates.push(value);
   };

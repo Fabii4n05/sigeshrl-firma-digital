@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
 import { createWorker, PSM } from "tesseract.js";
-import { parseDni } from "../src/dni";
+import { parseDni } from "../src/lib/dni.js";
 test("El motor OCR real reconoce el número de la muestra ficticia", async () => {
   const worker = await createWorker("spa", 1, {
     langPath: path.resolve("public/ocr"),

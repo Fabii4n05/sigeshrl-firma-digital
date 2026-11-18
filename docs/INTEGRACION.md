@@ -13,7 +13,9 @@ La operación local `POST /api/documents/{documentId}/sign` comprueba sesión, �
 5. Conservar los bytes originales firmados, el resultado de verificación y el vínculo con documento, versión y firmante. La huella del JSON de esta demo no sustituye esas validaciones.
 6. Actualizar el estado solo tras verificación satisfactoria. Mantener el pendiente si el componente falla o rechaza la firma.
 
-Los certificados, claves privadas y PIN no deben viajar en los mensajes de intercambio clínico. Firma Perú es una opción de evaluación; esta entrega no incluye sus credenciales ni declara estar integrada a esa plataforma.
+La clave privada y el PIN no viajan a la API ni en mensajes de intercambio clínico. La prueba NFC devuelve el certificado público y la firma del desafío para su comprobación. Firma Perú es una opción de evaluación; esta entrega no incluye sus credenciales ni declara estar integrada a esa plataforma.
+
+La prueba separada `POST /api/nfc/challenges` prepara un desafío de diez minutos asociado a autor, documento, versión, DNI esperado y huella SHA-256. El APK firma sus bytes UTF-8 si puede acceder al chip. `POST /api/nfc/challenges/{id}/verify` comprueba correspondencia exacta, vigencia, DNI y RSA/SHA-256, y guarda una constancia técnica de un solo uso. No valida confianza o revocación y por ello no modifica `documents.status`, no crea una fila de firma clínica y no habilita Farmacia. No produce PAdES. El PIN solo se introduce en la app Android y se transmite al chip, sin acceso a Internet.
 
 ## Identificadores y datos
 

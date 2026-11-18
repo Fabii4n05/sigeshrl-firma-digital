@@ -10,7 +10,7 @@ El documento de referencia describe una implementación hospitalaria y una demos
 | RF-02 | Agenda por fecha, búsqueda por paciente, historia o DNI, filtro de estado y ámbito profesional y especialidad; API admite especialidad y profesional | La interfaz fija servicio, especialidad y profesional según el perfil. No ofrece agenda institucional de múltiples profesionales |
 | RF-03 | Atención vinculada a cita e historia, registro médico, enfermería, nota y receta con autor y versión | Formatos ilustrativos, sin catálogo clínico ni sistema hospitalario conectado |
 | RF-04 | Bandeja, vista completa del contenido conservado, estados, último error y posición de marca | Vista HTML y PDF académico, sin visor de originales institucionales firmados |
-| RF-05 | Solicitud de firma simulada, control de autoría y versión, original JSON y huella SHA-256 | No implementa firma digital IOFE, validación de certificado, revocación ni identidad con DNIe |
+| RF-05 | Firma simulada y prueba técnica separada con Android NFC, control de autoría y versión, original JSON y huella SHA-256 | NFC pendiente de tarjeta física; no valida cadena de confianza, revocación ni PAdES institucional |
 | RF-06 | Rechazo y falta de respuesta mantienen pendientes; reintentos controlados; correcciones conservan versiones anteriores | La respuesta del firmador se elige en un simulador |
 | RF-07 | Receta vigente habilitada tras simulación, bloqueo de pendientes, entrega con fecha y usuario, unicidad por versión | Dispensación ficticia, sin inventario, entregas parciales ni contingencias institucionales |
 | RF-08 | Resumen y detalle por servicio y fechas, historias únicas y permiso adicional de detalle | Cifras ficticias. Línea base real y definición institucional deben confirmarse con DITI |
@@ -32,10 +32,10 @@ El documento de referencia describe una implementación hospitalaria y una demos
 
 ## Alternativa al lector
 
-La lectura óptica obtiene el número impreso y siempre exige revisión. Funciona con cámara o una imagen, sin acceso al chip. La foto se procesa dentro del navegador y no se almacena en el servidor.
+La lectura óptica obtiene el número impreso y siempre exige revisión. La opción principal es cámara en vivo, con códigos o texto/MRZ. También se admite un lector USB en modo teclado. La imagen cargada es el último respaldo. El procesamiento ocurre dentro del navegador y no se almacenan fotografías en el servidor.
 
-Web NFC se limita a NDEF y no brinda operaciones de bajo nivel como ISO-DEP. Esto impide usar la API web NFC de esta solución como lector del chip del DNIe. No se concluye que todo desarrollo nativo con NFC sea imposible: requeriría evaluar la versión de tarjeta, los protocolos, la aplicación nativa y la compatibilidad, elementos que no están disponibles en este encargo.
+Web NFC se limita a NDEF y no brinda operaciones de bajo nivel como ISO-DEP. Se preparó una app nativa Android sin permiso de Internet que intenta acceder a PKI usando los perfiles documentados del DNIe 2.0 y 3.0. Su compatibilidad depende de la tarjeta y debe probarse físicamente. El servidor verifica la respuesta criptográfica como prueba técnica sin cambiar estados clínicos, porque faltan confianza y revocación.
 
 ## Decisiones del desarrollo
 
-La solicitud del usuario autorizó elegir una tecnología sencilla y preparar una alternativa al lector. Se escogieron React, TypeScript y Node.js con SQLite, en lugar de la propuesta Laravel y MySQL de la guía. La imagen de muestra, las cuentas, las cifras y las observaciones clínicas fueron creadas para esta demostración. La entrega no representa una implementación aprobada por el hospital.
+El usuario solicitó React, Vite y una estructura como AdminLab. La interfaz usa JSX y React Router con páginas, componentes, estilos y utilidades separados; el servicio local conserva Node.js, TypeScript y SQLite. Las cuentas, las cifras y las observaciones clínicas fueron creadas para esta demostración. La entrega no representa una implementación aprobada por el hospital.

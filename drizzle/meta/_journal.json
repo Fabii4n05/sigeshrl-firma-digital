@@ -8,6 +8,13 @@
       "when": 1794952800000,
       "tag": "0000_initial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794974400000,
+      "tag": "0001_nfc_trials",
+      "breakpoints": true
     }
   ]
 }

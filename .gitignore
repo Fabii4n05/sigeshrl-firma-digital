@@ -9,3 +9,4 @@ backups/
 *.zip
 coverage/
 .wrangler/
+android-nfc/build/

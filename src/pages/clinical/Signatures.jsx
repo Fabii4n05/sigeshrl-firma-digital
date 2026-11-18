@@ -1,3 +1,5 @@
+import { DocumentPreview } from "../../components/clinical/DocumentPreview";
+import NfcSignatureTrial from "../../components/clinical/NfcSignatureTrial";
 import React, { useState, useEffect, useRef } from "react";
 import {
   FilePenLine,
@@ -8,7 +10,6 @@ import {
   CheckCircle2,
   Search,
   ArrowRight,
-  Clock3,
   AlertTriangle,
   Check,
   GitBranch,
@@ -18,9 +19,14 @@ import {
   FileJson,
   LockKeyhole,
 } from "lucide-react";
-import type { PageProps } from "../App";
-import { request, post, formatDate, docTitle, downloadJSON } from "../api";
-import { useResource } from "../hooks";
+import {
+  request,
+  post,
+  formatDate,
+  docTitle,
+  downloadJSON,
+} from "../../lib/api.js";
+import { useResource } from "../../lib/hooks.js";
 import {
   PageHeading,
   Panel,
@@ -29,15 +35,9 @@ import {
   Empty,
   Badge,
   Modal,
-} from "../ui";
-import { exportPDF } from "../pdf";
-export function Signatures({
-  user,
-  go,
-  notify,
-  documentId,
-  encounterId,
-}: PageProps & { documentId?: string; encounterId?: string }) {
+} from "../../components/shared/UI.jsx";
+import { exportPDF } from "../../lib/pdf.js";
+export function Signatures({ user, go, notify, documentId, encounterId }) {
   const list = useResource(
     "/documents" + (encounterId ? "?encounter=" + encounterId : ""),
   );
@@ -49,9 +49,9 @@ export function Signatures({
     [signing, setSigning] = useState(false),
     [reviewed, setReviewed] = useState(false),
     [busy, setBusy] = useState(""),
-    [verifyResult, setVerifyResult] = useState<any>(null),
+    [verifyResult, setVerifyResult] = useState(null),
     [modal, setModal] = useState(false);
-  const fileInput = useRef<HTMLInputElement>(null);
+  const fileInput = useRef(null);
   const detail = useResource(selected ? "/documents/" + selected : null);
   const d = detail.data?.document;
   useEffect(() => {
@@ -63,7 +63,7 @@ export function Signatures({
       setSelected(
         (
           rows.find(
-            (d: any) => d.patient_name === "Paciente 014" && d.type === "nota",
+            (d) => d.patient_name === "Paciente 014" && d.type === "nota",
           ) ?? rows[0]
         ).id,
       );
@@ -75,11 +75,11 @@ export function Signatures({
     setPlacement(d?.placement ?? "right");
   }, [d?.id, d?.status]);
   const rows = list.data?.documents ?? [],
-    pending = rows.filter((x: any) => x.status === "pending").length;
+    pending = rows.filter((x) => x.status === "pending").length;
   const visible = rows.filter(
-    (x: any) =>
+    (x) =>
       (filter === "all" || x.status === filter) &&
-      [x.patient_name, x.history, docTitle(x.type)].some((s: string) =>
+      [x.patient_name, x.history, docTitle(x.type)].some((s) =>
         s.toLowerCase().includes(search.toLowerCase()),
       ),
   );
@@ -100,12 +100,12 @@ export function Signatures({
       list.reload();
       detail.reload();
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
     } finally {
       setSigning(false);
     }
   }
-  async function verify(rawPayload?: string) {
+  async function verify(rawPayload) {
     setBusy("verify");
     try {
       const result = await post(
@@ -120,12 +120,12 @@ export function Signatures({
         !result.valid,
       );
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
     } finally {
       setBusy("");
     }
   }
-  async function compare(file: File) {
+  async function compare(file) {
     try {
       if (file.size > 1_000_000)
         throw new Error("Selecciona una copia JSON de menos de 1 MB.");
@@ -136,10 +136,10 @@ export function Signatures({
         );
       await verify(copy.rawPayload);
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
     }
   }
-  async function download(format: string) {
+  async function download(format) {
     setBusy(format);
     try {
       const data = await request("/documents/" + d.id + "/export");
@@ -151,7 +151,7 @@ export function Signatures({
           : "Copia original y constancia de simulación descargadas.",
       );
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
     } finally {
       setBusy("");
     }
@@ -228,7 +228,7 @@ export function Signatures({
             />
           ) : (
             <div className="document-list-items">
-              {visible.map((item: any) => (
+              {visible.map((item) => (
                 <button
                   key={item.id}
                   className={selected === item.id ? "selected" : ""}
@@ -465,6 +465,9 @@ export function Signatures({
                     </p>
                   </div>
                 </Panel>
+                {d.is_current && (
+                  <NfcSignatureTrial key={d.id} document={d} notify={notify} />
+                )}
               </>
             )
           )}
@@ -545,124 +548,5 @@ export function Signatures({
         </Modal>
       )}
     </>
-  );
-}
-export function DocumentPreview({
-  document: d,
-  placement = "right",
-}: {
-  document: any;
-  placement?: string;
-}) {
-  const p = d.payload;
-  return (
-    <article className="document-paper">
-      <header className="paper-header">
-        <div>
-          <strong>SIGESHRL</strong>
-          <span>Hospital Regional Lambayeque</span>
-        </div>
-        <span>
-          DOCUMENTO DE
-          <br />
-          DEMOSTRACIÓN
-        </span>
-      </header>
-      <div className="paper-title">
-        <span>{p.service.toUpperCase()}</span>
-        <h2>{docTitle(p.type)}</h2>
-        <p>
-          {p.patient.history} <b>·</b> Versión {p.version} <b>·</b>{" "}
-          {formatDate(p.date)}
-        </p>
-      </div>
-      <dl className="paper-patient">
-        <div>
-          <dt>Paciente</dt>
-          <dd>{p.patient.name}</dd>
-        </div>
-        <div>
-          <dt>DNI</dt>
-          <dd>{p.patient.dni}</dd>
-        </div>
-        <div className="full">
-          <dt>Profesional responsable</dt>
-          <dd>{p.author}</dd>
-        </div>
-      </dl>
-      <div className="paper-content">
-        {p.type === "nota" ? (
-          <>
-            <section>
-              <h3>Motivo de consulta</h3>
-              <p>{p.reason}</p>
-            </section>
-            <section>
-              <h3>Diagnóstico</h3>
-              <p>{p.diagnosis}</p>
-            </section>
-            <section>
-              <h3>Evolución</h3>
-              <p>{p.evolution}</p>
-            </section>
-          </>
-        ) : p.type === "enfermeria" ? (
-          <section>
-            <h3>Cuidados y observaciones</h3>
-            <p>{p.nursing}</p>
-          </section>
-        ) : (
-          <>
-            <h3>Prescripción de ejemplo</h3>
-            {(p.prescription ?? []).map((item: any, i: number) => (
-              <section className="paper-rx" key={i}>
-                <span>{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <h4>{item.name}</h4>
-                  <p>
-                    {item.dose}
-                    <br />
-                    {item.frequency}
-                    <br />
-                    {item.duration}
-                  </p>
-                  <strong>Cantidad: {item.quantity}</strong>
-                </div>
-              </section>
-            ))}
-          </>
-        )}
-      </div>
-      <div
-        className={
-          "paper-signature " + (d.status === "signed" ? d.placement : placement)
-        }
-      >
-        <div className={d.status === "signed" ? "stamped" : "placeholder"}>
-          <FilePenLine size={21} />
-          <div>
-            <strong>
-              {d.status === "signed"
-                ? "FIRMA SIMULADA"
-                : "ZONA VISIBLE DE FIRMA"}
-            </strong>
-            <span>
-              {d.status === "signed"
-                ? d.signer_name
-                : "Pie de la última página"}
-            </span>
-            <small>
-              {d.status === "signed"
-                ? formatDate(d.signed_at, true)
-                : "Vista previa de ubicación"}
-            </small>
-          </div>
-        </div>
-      </div>
-      <footer className="paper-footer">
-        <span>Datos ficticios · Sin validez clínica ni firma digital IOFE</span>
-        <span>1 / 1</span>
-      </footer>
-    </article>
   );
 }

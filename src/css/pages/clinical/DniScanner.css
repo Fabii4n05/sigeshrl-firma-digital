@@ -1,0 +1,145 @@
+.scanner-modes {
+  display: flex;
+  gap: 8px;
+  padding: 17px 20px 0;
+}
+.scanner-modes button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 9px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.scanner-modes button.active {
+  background: var(--mint);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.scanner-camera {
+  min-height: 300px;
+}
+.scanner-camera > svg {
+  color: var(--primary);
+  opacity: 0.65;
+}
+.scanner-frame {
+  position: absolute;
+  inset: 19% 10%;
+  border: 2px solid #9ee0c8;
+  border-radius: 10px;
+  pointer-events: none;
+}
+.scanner-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+  padding: 14px 22px 0;
+}
+.scanner-status svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.scanner-option {
+  border-top: 1px solid var(--line);
+  padding: 16px 20px;
+  font-size: 11px;
+}
+.scanner-option summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
+}
+.scanner-option p {
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.scanner-option form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.scanner-option form input {
+  min-width: 0;
+  font-size: 12px;
+}
+.scanner-option.fallback {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin: 3px 0 22px;
+}
+.scanner-option input[type="file"] {
+  margin-top: 12px;
+  font-size: 11px;
+}
+.scanner-sample {
+  padding: 0 22px 17px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.scanner-sample summary {
+  cursor: pointer;
+}
+.scanner-sample img {
+  display: block;
+  width: 180px;
+  max-width: 100%;
+  margin: 13px auto;
+}
+.scanner-sample p {
+  text-align: center;
+  font-size: 10px;
+}
+.scanner-nfc {
+  padding: 21px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.9;
+}
+.scanner-nfc > svg {
+  color: var(--primary);
+  margin-bottom: 9px;
+}
+.scanner-nfc .button {
+  margin-top: 16px;
+}
+.scanner-nfc small {
+  font-size: 10px;
+  display: block;
+  margin-top: 13px;
+}
+.reader-grid > * {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  .scanner-modes {
+    padding: 15px 17px 0;
+    gap: 7px;
+  }
+  .scanner-modes button {
+    font-size: 10px;
+    padding: 9px 6px;
+  }
+  .scanner-option form {
+    flex-wrap: wrap;
+  }
+  .scanner-option form input {
+    width: 100%;
+  }
+  .scanner-option form .button {
+    width: 100%;
+  }
+}

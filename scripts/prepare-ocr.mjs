@@ -23,6 +23,12 @@ const languages = await find("node_modules/@tesseract.js-data/spa");
 const language = languages.find((p) => p.includes("best_int")) ?? languages[0];
 if (!language) throw new Error("No se encontraron los datos OCR en español.");
 await copyFile(language, path.join(dest, "spa.traineddata.gz"));
-await copyFile("node_modules/tesseract.js/LICENSE.md",path.join(dest,"LICENSE-tesseract.md"));
-await copyFile("node_modules/tesseract.js-core/LICENSE",path.join(dest,"LICENSE-core.txt"));
+await copyFile(
+  "node_modules/tesseract.js/LICENSE.md",
+  path.join(dest, "LICENSE-tesseract.md"),
+);
+await copyFile(
+  "node_modules/tesseract.js-core/LICENSE",
+  path.join(dest, "LICENSE-core.txt"),
+);
 console.log("OCR preparado: motor y español disponibles localmente.");

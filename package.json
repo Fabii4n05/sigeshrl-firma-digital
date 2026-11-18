@@ -9,7 +9,10 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "tsc --noEmit && node scripts/build.mjs",
+    "dev:web": "vite",
+    "dev:api": "node scripts/api.mjs",
+    "build": "vite build && node scripts/build-server.mjs",
+    "preview": "vite preview",
     "start": "node dist/local/server.mjs",
     "test": "tsx --test tests/*.test.ts",
     "db:backup": "node scripts/backup.mjs",
@@ -19,19 +22,25 @@
   "dependencies": {
     "@hono/node-server": "^2.1.9",
     "@tesseract.js-data/spa": "^1.0.0",
+    "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
     "hono": "^4.11.0",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.468.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router": "^8.5.1",
+    "qrcode": "^1.5.4",
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "esbuild": "^0.25.12",
+    "@vitejs/plugin-react": "^6.1.2",
+    "esbuild": "^0.28.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.3.6"
   }
 }

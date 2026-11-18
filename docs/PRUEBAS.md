@@ -1,44 +1,27 @@
-# Comprobaciones de la entrega
+# Comprobaciones del avance
 
-El proyecto se comprueba con pruebas de integración sobre SQLite y una revisión funcional en navegador. Se usan exclusivamente registros ficticios. Las pruebas automáticas no reemplazan las pruebas del firmador, del lector ni de infraestructura institucional.
+`npm test` ejecuta 26 comprobaciones sobre datos ficticios y una base SQLite en memoria. Pasan tras migrar a React y Vite.
 
-## Pruebas automatizadas
+- Sesión, contraseñas, cookies, permisos por rol, servicio, autor y registro.
+- Agenda, apertura sin duplicados, versiones y control de ediciones simultáneas.
+- DNI impreso, MRZ, ceros iniciales, dígito verificador y lecturas ambiguas.
+- Motor OCR real con la muestra ficticia incluida.
+- Formatos de escáner: texto, JSON, campo etiquetado y parámetro de URL; rechazo de códigos desconocidos.
+- Firma simulada satisfactoria y fallida, comparación SHA-256 y conservación del original.
+- Cobertura por historias, denominador cero y entregas de Farmacia sin duplicados.
+- Permisos de enfermería, supervisión y administración, vencimiento y rechazo de otro origen.
+- Prueba NFC con un certificado autofirmado generado en memoria y firma RSA real: se rechazan contenido alterado, firma inválida, DNI distinto, solicitudes vencidas y repetidas. Una prueba correcta conserva la receta pendiente y no crea una firma clínica.
 
-Ejecutar `npm test`. Se incluyen:
+`npm run build` genera la interfaz con Vite y empaqueta el servicio local y el Worker. No es un comprobador de tipos. `npm audit` no informó vulnerabilidades en la revisión de esta entrega.
 
-- Acceso sin sesión, contraseña incorrecta y atributos de la cookie.
-- Rechazo de solicitudes fuera de rol, servicio, registro y autoría.
-- Agenda vinculada a historia y episodio; apertura repetida sin duplicar la atención.
-- DNI con ceros iniciales, dígito verificador, formato TD1, lecturas ambiguas y formatos descartados.
-- Ejecución del motor OCR real sobre la muestra PNG incluida.
-- Farmacia sin acceso a la nota ni a sus campos clínicos y con bloqueo de recetas pendientes.
-- Cobertura inicial de 17/20, denominador cero y periodo inválido.
-- Rechazo y falta de respuesta del firmador manteniendo pendientes.
-- Firma de solo la nota sin completar la historia ni habilitar la receta.
-- Comparación SHA-256 del original y rechazo de una copia alterada, incluso si solo cambia un espacio.
-- Solicitudes simultáneas de firma sin duplicar la constancia.
-- Dos solicitudes de dispensación con una sola entrega registrada.
-- Nueva versión de una atención firmada conservando el contenido anterior.
-- Ediciones simultáneas con rechazo de la versión obsoleta.
-- Registro y firma de enfermería sin acceso al contenido de la nota médica.
-- Cambios de permisos que revocan sesiones y restricción del detalle de Supervisión.
-- Inactividad de sesión y rechazo de solicitudes de otro origen.
-- Bitácora con eventos y sin operación de borrado.
+El APK se compila con Java y Android SDK. `apksigner verify` comprueba sus firmas de paquete v2 y v3. Esto verifica la integridad del instalador, no la compatibilidad con un DNIe físico.
 
-La compilación `npm run build` verifica los tipos de TypeScript y genera los recursos de la interfaz y las entradas de servidor. `npm audit` comprueba los avisos de las dependencias instaladas en el momento de la revisión.
+## Revisión en navegador
 
-## Recorrido en navegador
+La revisión se centra en acceso, navegación de React Router, escáner, QR ficticio decodificado, revisión de DNI, apertura de atención, documentos y solicitud NFC. El recorrido de firma simulada, cobertura y Farmacia tiene además comprobación automática de extremo a extremo en la API.
 
-Se revisa el acceso, la agenda, el OCR, la búsqueda confirmada del DNI `00000014`, la atención del Paciente 014, la vista previa, el rechazo, las dos firmas simuladas, la comparación de integridad, la descarga de PDF, el reporte de cobertura y la dispensación.
+## Límites
 
-También se comprueban la navegación con el selector de perfiles, la presentación en modo oscuro y el ajuste de la interfaz a una ventana móvil emulada. Las tablas anchas conservan desplazamiento horizontal en pantallas pequeñas.
+No se ha probado la cámara física, un escáner USB físico, el APK instalado en Android ni el chip de un DNIe real. Tampoco la cadena de confianza, revocación de certificados, PAdES, SIHCE o la red del hospital. No se certifica seguridad de producción, accesibilidad formal ni rendimiento institucional.
 
-## Comprobación de persistencia y respaldo
-
-El servidor local utiliza `data/sigeshrl.sqlite`; reiniciar el proceso no recrea ni borra los registros. El sembrado inicial usa un marcador de versión y solo agrega los datos de prueba en una base nueva. Los comandos de respaldo y restauración operan con copias consistentes de SQLite.
-
-La restauración debe ensayarse sobre una base de prueba y con el servidor detenido. Tras restaurar se comprueban el número de documentos y la bitácora, y se exige volver a iniciar sesión. No usar la base de una exposición en curso para ensayar la recuperación.
-
-## Límites de la verificación
-
-No se prueba un DNI físico, una cámara física, un teléfono real, un lector smartcard, un certificado de RENIEC, un servicio de revocación, el SIHCE ni una integración con la red del hospital. No se certifica accesibilidad formal, seguridad de producción ni la carga institucional de dos segundos, que depende de condiciones que la guía deja por definir con DITI.
+Las pruebas no modifican la base que se usa para exponer. Reiniciar conserva los datos; las migraciones se aplican una sola vez. Los comandos de respaldo y restauración siguen disponibles y deben ensayarse con una base de prueba y el servidor detenido.

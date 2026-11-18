@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseDni } from "../src/dni";
+import { parseDni } from "../src/lib/dni.js";
 test("El DNI impreso conserva los ceros iniciales", () =>
   assert.equal(parseDni("DNI\n00000014\nPACIENTE").dni, "00000014"));
 test("Un dígito verificador separado no se incorpora al DNI", () =>

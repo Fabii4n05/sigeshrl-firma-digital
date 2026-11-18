@@ -16,10 +16,16 @@ import {
   History,
   Stethoscope,
 } from "lucide-react";
-import type { PageProps } from "../App";
-import { request, post, formatDate, docTitle } from "../api";
-import { useResource } from "../hooks";
-import { PageHeading, Panel, Spinner, ErrorBox, Empty, Badge } from "../ui";
+import { request, post, formatDate, docTitle } from "../../lib/api.js";
+import { useResource } from "../../lib/hooks.js";
+import {
+  PageHeading,
+  Panel,
+  Spinner,
+  ErrorBox,
+  Empty,
+  Badge,
+} from "../../components/shared/UI.jsx";
 const emptyItem = () => ({
   name: "",
   dose: "",
@@ -27,16 +33,11 @@ const emptyItem = () => ({
   duration: "",
   quantity: 1,
 });
-export function Encounter({
-  user,
-  go,
-  notify,
-  id,
-}: PageProps & { id?: string }) {
+export function Encounter({ user, go, notify, id }) {
   const { data, error, loading, reload } = useResource(
     id ? "/encounters/" + id : null,
   );
-  const [form, setForm] = useState<any>({
+  const [form, setForm] = useState({
       reason: "",
       diagnosis: "",
       evolution: "",
@@ -49,7 +50,7 @@ export function Encounter({
     [history, setHistory] = useState(false);
   const e = data?.encounter,
     docs = data?.documents ?? [];
-  const signed = docs.some((d: any) => d.is_current && d.status === "signed");
+  const signed = docs.some((d) => d.is_current && d.status === "signed");
   const locked = signed && !newVersion;
   useEffect(() => {
     if (e) {
@@ -65,7 +66,7 @@ export function Encounter({
     }
   }, [e]);
   useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => {
+    const warn = (event) => {
       if (dirty) {
         event.preventDefault();
       }
@@ -73,8 +74,8 @@ export function Encounter({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
-  function update(key: string, value: any) {
-    setForm((f: any) => ({ ...f, [key]: value }));
+  function update(key, value) {
+    setForm((f) => ({ ...f, [key]: value }));
     setDirty(true);
   }
   async function save() {
@@ -91,7 +92,7 @@ export function Encounter({
       reload();
       return true;
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
       return false;
     } finally {
       setBusy(false);
@@ -110,15 +111,15 @@ export function Encounter({
       );
       reload();
     } catch (e) {
-      notify((e as Error).message, true);
+      notify(e.message, true);
     } finally {
       setBusy(false);
     }
   }
-  function setItem(index: number, key: string, value: any) {
+  function setItem(index, key, value) {
     update(
       "prescription",
-      form.prescription.map((item: any, i: number) =>
+      form.prescription.map((item, i) =>
         i === index ? { ...item, [key]: value } : item,
       ),
     );
@@ -327,7 +328,7 @@ export function Encounter({
                       clínica.
                     </div>
                   ) : (
-                    form.prescription.map((item: any, index: number) => (
+                    form.prescription.map((item, index) => (
                       <div className="prescription-item" key={index}>
                         <div className="item-number">
                           {String(index + 1).padStart(2, "0")}
@@ -410,9 +411,7 @@ export function Encounter({
                           onClick={() =>
                             update(
                               "prescription",
-                              form.prescription.filter(
-                                (_: any, i: number) => i !== index,
-                              ),
+                              form.prescription.filter((_, i) => i !== index),
                             )
                           }
                         >
@@ -454,7 +453,7 @@ export function Encounter({
             title="Documentos de la atención"
             subtitle="Revisa el contenido antes de simular la firma."
           >
-            {!docs.filter((d: any) => d.is_current).length ? (
+            {!docs.filter((d) => d.is_current).length ? (
               <Empty
                 title="Aún no hay documentos"
                 message="Se crean cuando guardas el registro."
@@ -462,8 +461,8 @@ export function Encounter({
             ) : (
               <div className="document-links">
                 {docs
-                  .filter((d: any) => d.is_current)
-                  .map((d: any) => (
+                  .filter((d) => d.is_current)
+                  .map((d) => (
                     <button key={d.id} onClick={() => go("firmas/" + d.id)}>
                       <span className="doc-type-icon">
                         {d.type === "receta" ? (
@@ -485,7 +484,7 @@ export function Encounter({
             <div className="panel-inner-footer">
               <button
                 className="button primary full"
-                disabled={!docs.some((d: any) => d.is_current) || dirty}
+                disabled={!docs.some((d) => d.is_current) || dirty}
                 onClick={() => go("firmas?atencion=" + id)}
               >
                 <FilePenLine size={16} />
@@ -527,7 +526,7 @@ export function Encounter({
           </button>
           {history && (
             <div className="version-history">
-              {docs.map((d: any) => (
+              {docs.map((d) => (
                 <button key={d.id} onClick={() => go("firmas/" + d.id)}>
                   <strong>
                     {docTitle(d.type)} · v{d.version}

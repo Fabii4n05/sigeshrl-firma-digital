@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { request } from "./api";
-export function useResource<T = any>(url: string | null, key = 0) {
-  const [data, setData] = useState<T | null>(null),
+import { request } from "./api.js";
+export function useResource(url, key = 0) {
+  const [data, setData] = useState(null),
     [error, setError] = useState(""),
     [loading, setLoading] = useState(true),
     [revision, setRevision] = useState(0);
@@ -14,7 +14,7 @@ export function useResource<T = any>(url: string | null, key = 0) {
     let active = true;
     setLoading(true);
     setError("");
-    request<T>(url)
+    request(url)
       .then((value) => {
         if (active) setData(value);
       })

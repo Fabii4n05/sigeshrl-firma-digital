@@ -1,16 +1,12 @@
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-  ) {
+  status;
+  constructor(message, status) {
     super(message);
+    this.status = status;
   }
 }
-export async function request<T = any>(
-  url: string,
-  options: RequestInit = {},
-): Promise<T> {
-  let response: Response;
+export async function request(url, options = {}) {
+  let response;
   try {
     response = await fetch("/api" + url, {
       credentials: "same-origin",
@@ -26,7 +22,7 @@ export async function request<T = any>(
       "No hay conexión con la aplicación. Reintenta; los registros guardados se conservan.",
     );
   }
-  let data: any;
+  let data;
   try {
     data = await response.json();
   } catch {
@@ -44,9 +40,9 @@ export async function request<T = any>(
   }
   return data;
 }
-export const post = (url: string, data: unknown = {}) =>
+export const post = (url, data = {}) =>
   request(url, { method: "POST", body: JSON.stringify(data) });
-export function downloadJSON(data: unknown, name: string) {
+export function downloadJSON(data, name) {
   const url = URL.createObjectURL(
     new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
   );
@@ -60,20 +56,20 @@ export const localDate = () =>
   new Intl.DateTimeFormat("en-CA", { timeZone: "America/Lima" }).format(
     new Date(),
   );
-export const formatDate = (s: string, full = false) =>
+export const formatDate = (s, full = false) =>
   new Intl.DateTimeFormat("es-PE", {
     timeZone: "America/Lima",
     ...(full
       ? { dateStyle: "medium", timeStyle: "short" }
       : { day: "2-digit", month: "short", year: "numeric" }),
   }).format(new Date(s.length === 10 ? s + "T12:00:00-05:00" : s));
-export const docTitle = (type: string) =>
+export const docTitle = (type) =>
   ({
     nota: "Nota clínica",
     receta: "Receta electrónica",
     enfermeria: "Registro de enfermería",
   })[type] ?? type;
-export const roleTitle = (role: string) =>
+export const roleTitle = (role) =>
   ({
     medico: "Médico",
     enfermeria: "Enfermería",

@@ -1,5 +1,10 @@
 export type Role =
-  "medico" | "enfermeria" | "admision" | "supervision" | "farmacia" | "admin";
+  | "medico"
+  | "enfermeria"
+  | "admision"
+  | "supervision"
+  | "farmacia"
+  | "admin";
 export type Row = Record<string, any>;
 export interface Result {
   success: boolean;

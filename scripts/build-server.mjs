@@ -1,24 +1,5 @@
 import { build } from "esbuild";
-import { mkdir, copyFile, writeFile, readFile, cp } from "node:fs/promises";
-await mkdir("dist/client/assets", { recursive: true });
-await cp("public", "dist/client", { recursive: true });
-await build({
-  entryPoints: { app: "src/main.tsx" },
-  outdir: "dist/client/assets",
-  bundle: true,
-  format: "esm",
-  splitting: true,
-  platform: "browser",
-  target: "es2022",
-  minify: true,
-  jsx: "automatic",
-  define: { "process.env.NODE_ENV": '"production"' },
-});
-const html = (await readFile("index.html", "utf8")).replace(
-  '<script type="module" src="/src/main.tsx"></script>',
-  '<link rel="stylesheet" href="/assets/app.css"/><script type="module" src="/assets/app.js"></script>',
-);
-await writeFile("dist/client/index.html", html);
+import { mkdir, copyFile, writeFile } from "node:fs/promises";
 await mkdir("dist/server", { recursive: true });
 await mkdir("dist/local", { recursive: true });
 await mkdir("dist/.openai", { recursive: true });
@@ -60,4 +41,4 @@ await writeFile(
     ],
   }),
 );
-console.log("Aplicación compilada para ejecución local y servidor web.");
+console.log("Servidor local y publicación preparados.");
